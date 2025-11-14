@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ElectroVault - Mini E-Commerce (Single File)</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+
+  <style>
+    /* small custom styles */
+    .fade { transition: all .22s ease; }
+    .hidden-panel { display: none; }
+    .chip { padding: .18rem .5rem; border-radius: 999px; font-weight:600 }
+    .card-shadow { box-shadow: 0 10px 20px rgba(15,23,42,.06) }
+    /* nice scroll */
+    .scrollbar::-webkit-scrollbar { width: 8px; }
+    .scrollbar::-webkit-scrollbar-thumb { background:#94a3b8; border-radius:999px; }
+  </style>
+</head>
+<body class="bg-gray-50 text-slate-800 font-sans">
+
+  <!-- Header / Nav -->
+  <header class="bg-white shadow sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="#" class="flex items-center space-x-2">
+        <i class="fa-solid fa-bolt text-yellow-400 text-2xl"></i>
+        <span class="text-2xl font-bold">ElectroVault</span>
+      </a>
+
+      <nav class="hidden md:flex items-center space-x-6">
+        <a href="#home" class="hover:text-teal-600">Home</a>
+        <a href="#products" class="hover:text-teal-600">Products</a>
+        <a href="#contact" class="hover:text-teal-600">Contact Us</a>
+        <a href="#about" class="hover:text-teal-600">About Us</a>
+        <button id="accountBtn" class="ml-2 px-3 py-1 rounded-full bg-teal-600 text-white hover:opacity-90 hidden">
+          <i class="fa-regular fa-user mr-2"></i><span id="accountName">Account</span>
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <button onclick="toggleCart()" title="Cart" class="p-2 rounded-lg hover:bg-gray-100">
+            <i class="fa-solid fa-cart-shopping text-xl"></i>
+            <span id="cartBadge" class="absolute -right-1 -top-1 bg-yellow-400 text-xs font-bold px-1.5 rounded-full">0</span>
+          </button>
+        </div>
+        <button id="loginBtn" onclick="openAuth('login')" class="px-3 py-1 rounded-full border border-teal-600 text-teal-600 hover:bg-teal-50">
+          Login / Sign Up
+        </button>
+
+        <!-- Mobile menu (simple) -->
+        <button class="md:hidden p-2" onclick="document.getElementById('mobileNav').classList.toggle('hidden')">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile nav -->
+    <div id="mobileNav" class="md:hidden hidden bg-white border-t">
+      <div class="px-4 py-3 flex flex-col space-y-2">
+        <a href="#home" class="py-1">Home</a>
+        <a href="#products" class="py-1">Products</a>
+        <a href="#contact" class="py-1">Contact Us</a>
+        <a href="#about" class="py-1">About Us</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+    <!-- Hero / Home -->
+    <section id="home" class="bg-white rounded-xl p-6 card-shadow">
+      <div class="md:flex items-center gap-6">
+        <div class="flex-1">
+          <h1 class="text-3xl md:text-4xl font-extrabold">Powering Your World with the Latest Tech</h1>
+          <p class="mt-3 text-gray-600">Shop smartphones, laptops, accessories and more. Designed to be the minimal educational submission for your assignment.</p>
+          <div class="mt-4 flex gap-3">
+            <a href="#products" class="px-4 py-2 bg-teal-600 text-white rounded-lg">Shop Products</a>
+            <a href="#contact" class="px-4 py-2 border rounded-lg">Contact Support</a>
+          </div>
+        </div>
+        <div class="w-full md:w-1/3 mt-5 md:mt-0">
+          <img src="https://placehold.co/600x380/0d9488/ffffff?text=ElectroVault" class="rounded-lg w-full" alt="hero">
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section id="products">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold">Featured Products</h2>
+        <div class="text-sm text-gray-600">Click <span class="font-semibold">Add to Cart</span> to include item.</div>
+      </div>
+
+      <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- User Sections (Orders, Wishlist, Reviews, Customer Care, Reporting) -->
+    <section id="userSections" class="bg-white rounded-xl p-6 card-shadow">
+      <h3 class="text-xl font-semibold mb-4">Account Sections (Orders • Wishlist • Reviews • Support • Reporting)</h3>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- ORDERS -->
+        <div class="col-span-1 border rounded-lg p-4">
+          <h4 class="font-semibold mb-3">Orders List</h4>
+          <div id="ordersList" class="space-y-3 text-sm text-gray-700">
+            <!-- filled dynamically -->
+          </div>
+        </div>
+
+        <!-- WISHLIST -->
+        <div class="col-span-1 border rounded-lg p-4">
+          <h4 class="font-semibold mb-3">Wishlist</h4>
+          <div id="wishlistList" class="space-y-3 text-sm text-gray-700">
+            <!-- filled dynamically -->
+          </div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="col-span-1 border rounded-lg p-4">
+          <h4 class="font-semibold mb-3">Comments & Reviews</h4>
+          <div id="reviewsList" class="space-y-3 text-sm text-gray-700">
+            <!-- filled dynamically -->
+          </div>
+
+          <div class="mt-3">
+            <textarea id="newReview" placeholder="Write a review..." class="w-full border rounded p-2 text-sm"></textarea>
+            <div class="mt-2 flex justify-end">
+              <button onclick="postReview()" class="px-3 py-1 bg-teal-600 text-white rounded">Post</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mt-6">
+        <div class="border rounded-lg p-4">
+          <h4 class="font-semibold mb-3">Customer Care</h4>
+          <p class="text-sm text-gray-700">Hotline: <span class="font-semibold">+91 98765 43210</span></p>
+          <p class="text-sm text-gray-700 mt-2">Email: support@electrovault.com</p>
+          <button onclick="openContact()" class="mt-3 px-3 py-1 bg-blue-600 text-white rounded">Open Contact Form</button>
+        </div>
+
+        <div class="border rounded-lg p-4">
+          <h4 class="font-semibold mb-3">Reporting</h4>
+          <p class="text-sm text-gray-700">Report problems with products or the site.</p>
+          <div class="mt-2 grid grid-cols-1 gap-2">
+            <button onclick="report('product')" class="text-left px-3 py-2 border rounded">Report Product / Seller</button>
+            <button onclick="report('bug')" class="text-left px-3 py-2 border rounded">Report Technical Bug</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & About -->
+    <section id="contact" class="bg-white rounded-xl p-6 card-shadow">
+      <h3 class="text-xl font-semibold mb-3">Contact Us</h3>
+      <form id="contactForm" class="grid md:grid-cols-2 gap-4" onsubmit="handleContact(event)">
+        <input required id="contactName" placeholder="Your name" class="border p-2 rounded" />
+        <input required id="contactEmail" type="email" placeholder="Your email" class="border p-2 rounded" />
+        <textarea required id="contactMessage" rows="4" class="border p-2 rounded md:col-span-2" placeholder="Message"></textarea>
+        <div class="md:col-span-2 text-right">
+          <button class="px-4 py-2 bg-teal-600 text-white rounded">Send Message</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="about" class="bg-white rounded-xl p-6 card-shadow">
+      <h3 class="text-xl font-semibold mb-3">About Us</h3>
+      <p class="text-gray-700">ElectroVault is a mock e-commerce educational project implementing essential features: navigation, product listing, cart, login/signup validation, basic account sections (orders, wishlist, reviews), customer care and reporting options — all in a single HTML file for assignment submission.</p>
+    </section>
+
+  </main>
+
+  <!-- CART SIDEBAR -->
+  <aside id="cartPanel" class="fixed right-4 bottom-6 w-96 bg-white rounded-xl shadow-2xl p-4 hidden">
+    <div class="flex items-center justify-between mb-3">
+      <h4 class="font-bold">Your Cart</h4>
+      <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-800"><i class="fa-solid fa-times"></i></button>
+    </div>
+    <div id="cartItems" class="space-y-3 h-64 overflow-y-auto scrollbar pr-2"></div>
+    <div class="mt-3 border-t pt-3">
+      <div class="flex justify-between items-center">
+        <div class="font-semibold">Total:</div>
+        <div id="cartTotal" class="text-lg font-bold">₹0</div>
+      </div>
+      <div class="mt-3 flex gap-2">
+        <button onclick="checkout()" class="flex-1 px-3 py-2 bg-teal-600 text-white rounded">Checkout</button>
+        <button onclick="clearCart()" class="px-3 py-2 border rounded">Clear</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl w-full max-w-md p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="authTitle" class="font-bold text-lg">Login</h3>
+        <button onclick="closeAuth()" class="text-gray-600"><i class="fa-solid fa-times"></i></button>
+      </div>
+
+      <div class="flex gap-2 mb-4">
+        <button id="tabLogin" class="flex-1 py-2 rounded bg-teal-600 text-white" onclick="switchAuth('login')">Login</button>
+        <button id="tabSignup" class="flex-1 py-2 rounded border" onclick="switchAuth('signup')">Sign Up</button>
+      </div>
+
+      <form id="authForm" onsubmit="handleAuth(event)" class="space-y-3">
+        <input id="authEmail" type="email" placeholder="Email" required class="w-full border p-2 rounded" />
+        <input id="authPassword" type="password" placeholder="Password (min 6 chars)" minlength="6" required class="w-full border p-2 rounded" />
+        <div id="confirmGroup" class="hidden">
+          <input id="authConfirm" type="password" placeholder="Confirm Password" minlength="6" class="w-full border p-2 rounded" />
+        </div>
+
+        <div id="authMessage" class="text-sm text-red-600 min-h-[1.2rem]"></div>
+
+        <div class="flex gap-2">
+          <button type="submit" id="authSubmit" class="flex-1 px-3 py-2 bg-teal-600 text-white rounded">Login</button>
+          <button type="button" onclick="closeAuth()" class="px-3 py-2 border rounded">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Simple alert toast -->
+  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 bg-slate-900 text-white px-4 py-2 rounded opacity-0 transition-opacity z-50"></div>
+
+  <!-- Lightweight JavaScript -->
+  <script>
+    /* ----------------------------
+       Mock Data & State
+       ---------------------------- */
+    const products = [
+      { id:1, name:'Flagship Pro Smartphone', price:82999, desc:'6.7" display, dual camera', img:'https://www.samsungmobilepress.com/file/9A8B0C5E7AE223941FE931B23B810EB4B0889FB378F9B1FA94096036C43DE1D9CBD04954550FBC1C771FCC793F100E9B5F5CA2F530F87B9FD4380D9EADEC2F54798273B45EB93A9033A5AD11EE2772F26A4BAD909A7CC2D855BCEDD00CD694A0D3D74A1A1DFD89AB23A207E29BB7C4FCB75408D09299E0D7A20B2E7C743E5C83BFD92E8F115E7A657CE4E9C368FF4F451E8D9FE7A63E4C776A67EDBF7A360A39' },
+      { id:2, name:'UltraBook X1', price:124458, desc:'16GB RAM, 512GB SSD', img:'https://5.imimg.com/data5/SELLER/Default/2024/11/465910929/LK/XL/NT/163377091/lenovo-ideapad-gaming-3-82sb00y8in-laptop-500x500.jpg' },
+      { id:3, name:'AudioMax Wireless Buds', price:12367, desc:'ANC, 30h battery', img:'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRTtT0ook8Rhn2a-XxB5P0SuQ-ZEPYxMqkuq5tZ1vVXykRKrmEcTEbHfQ9AFHxli9iIQtu5r7ynL5z2C3HC9aGkiMJueK9sCK2sxR0fI1QDFYpnhVGVQZpW0w' },
+      { id:4, name:'SmartWatch Z', price:24899, desc:'Fitness & notifications', img:'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQx2jPOMOKuXckLluTrljOruaAoiuW6BJ55XzG3qW5R6uqKVML54kJTHlexnIUXe4-Z8YR_S1mdHJKA84-rq7GlbJHu0ObMXT6T2AX_ylDbjh0aLvAfhOmf' },
+      { id:5, name:'Gamer Console 5', price:41417, desc:'Next-gen gaming', img:'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR4uG40jwrGIrIAa6yRZPnrTDnNYgywpzIg3vUV9hbaGUbIhEp-BylnVNnsgjXKTel5p1rCNa8lo_tzUf7zYJXR3s3CYcN0HP4kMD3IfEwC3NOzxusdcigV' },
+      { id:6, name:'4K Display Pro Monitor', price:53950, desc:'27" IPS, color-accurate', img:'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRBk7WknSw7pXdxmL0zxPubzBgxzJtGB-7sharcZxpqDQFgdy0NgWGRglvTNTqrxSn3eLzT88p1oK-PF4vl32R0H1Ae4OL5Y56_Mug1El3SHc6QAOwo_E-LCZQ' }
+    ];
+
+    const mockOrders = [
+      { id:'ORD1001', date:'2024-11-01', total:124458, items:[{name:'UltraBook X1', qty:1}] },
+      { id:'ORD1002', date:'2024-11-05', total:82999, items:[{name:'Flagship Pro Smartphone', qty:1}] }
+    ];
+
+    const mockWishlist = [
+      { id:4, name:'SmartWatch Z', price:24899 },
+      { id:5, name:'Gamer Console 5', price:41417 }
+    ];
+
+    let cart = []; // {id, qty, name, price, img}
+    let isLoggedIn = false;
+    let currentUserEmail = null;
+    let authMode = 'login';
+
+    /* ----------------------------
+       Helpers & Renderers
+       ---------------------------- */
+    function formatINR(n) {
+      return '₹' + Number(n).toLocaleString('en-IN');
+    }
+
+    function showToast(msg, duration=2200) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('opacity-0');
+      setTimeout(()=> t.classList.add('opacity-0'), duration);
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = products.map(p => `
+        <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
+          <img src="${p.img}" alt="${p.name}" class="rounded h-44 object-cover mb-3">
+          <h4 class="font-semibold">${p.name}</h4>
+          <p class="text-sm text-gray-600 mb-2">${p.desc}</p>
+          <div class="mt-auto flex items-center justify-between">
+            <div class="text-lg font-bold">${formatINR(p.price)}</div>
+            <div class="flex gap-2">
+              <button onclick="addToCart(${p.id})" class="px-3 py-1 bg-yellow-400 rounded hover:opacity-90">Add to Cart</button>
+              <button onclick="addToWishlist(${p.id})" class="px-3 py-1 border rounded text-sm">Wishlist</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderCartUI() {
+      const container = document.getElementById('cartItems');
+      if (!container) return;
+      if (cart.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500">Your cart is empty.</p>';
+      } else {
+        container.innerHTML = cart.map(item => `
+          <div class="flex items-center gap-3 border-b pb-3">
+            <img src="${item.img}" class="w-16 h-12 object-cover rounded" alt="">
+            <div class="flex-1">
+              <div class="font-semibold text-sm">${item.name}</div>
+              <div class="text-xs text-gray-600">${formatINR(item.price)} x ${item.qty} = <span class="font-bold">${formatINR(item.price*item.qty)}</span></div>
+              <div class="mt-1 flex items-center gap-2 text-sm">
+                <button onclick="changeQty(${item.id}, -1)" class="px-2 py-1 border rounded">-</button>
+                <div class="px-2">${item.qty}</div>
+                <button onclick="changeQty(${item.id}, 1)" class="px-2 py-1 border rounded">+</button>
+                <button onclick="removeFromCart(${item.id})" class="ml-3 text-red-500 text-sm">Remove</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const total = cart.reduce((s,i)=> s + i.qty*i.price, 0);
+      document.getElementById('cartTotal').textContent = formatINR(total);
+      document.getElementById('cartBadge').textContent = cart.reduce((s,i)=> s + i.qty, 0);
+    }
+
+    function updateAccountUI() {
+      const btn = document.getElementById('accountBtn');
+      const nameSpan = document.getElementById('accountName');
+      const loginBtn = document.getElementById('loginBtn');
+      if (isLoggedIn) {
+        nameSpan.textContent = currentUserEmail.split('@')[0];
+        btn.classList.remove('hidden');
+        loginBtn.classList.add('hidden');
+      } else {
+        btn.classList.add('hidden');
+        loginBtn.classList.remove('hidden');
+      }
+      // render orders/wishlist/reviews
+      renderOrders();
+      renderWishlist();
+      renderReviews();
+    }
+
+    /* ----------------------------
+       Cart functions (simple)
+       ---------------------------- */
+    function addToCart(productId) {
+      const p = products.find(x=>x.id===productId);
+      if (!p) return;
+      const existing = cart.find(i=>i.id===productId);
+      if (existing) existing.qty += 1;
+      else cart.push({ id:p.id, name:p.name, price:p.price, qty:1, img:p.img });
+      renderCartUI();
+      showToast(`${p.name} added to cart`);
+    }
+
+    function changeQty(id, delta) {
+      const it = cart.find(i=>i.id===id);
+      if (!it) return;
+      it.qty += delta;
+      if (it.qty <= 0) cart = cart.filter(i=>i.id!==id);
+      renderCartUI();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(i=>i.id!==id);
+      renderCartUI();
+    }
+
+    function clearCart() {
+      cart = [];
+      renderCartUI();
+      showToast('Cart cleared');
+    }
+
+    function checkout() {
+      if (cart.length === 0) { showToast('Cart is empty', 1800); return; }
+      if (!isLoggedIn) { showToast('Please login to checkout', 2000); openAuth('login'); return; }
+      // simple mock checkout
+      const total = cart.reduce((s,i)=> s + i.price*i.qty, 0);
+      mockOrders.unshift({ id:'ORD' + (1000 + mockOrders.length + 1), date: new Date().toISOString().slice(0,10), total, items: cart.map(it=>({ name: it.name, qty: it.qty })) });
+      cart = [];
+      renderCartUI();
+      renderOrders();
+      showToast('Order placed successfully');
+      toggleCart(false);
+    }
+
+    /* ----------------------------
+       Wishlist
+       ---------------------------- */
+    function addToWishlist(productId) {
+      if (mockWishlist.find(w=>w.id===productId)) { showToast('Already in wishlist'); return; }
+      const p = products.find(x=>x.id===productId);
+      if (!p) return;
+      mockWishlist.push({ id:p.id, name:p.name, price:p.price });
+      renderWishlist();
+      showToast('Added to wishlist');
+    }
+
+    function removeFromWishlist(id) {
+      const idx = mockWishlist.findIndex(w=>w.id===id);
+      if (idx !== -1) mockWishlist.splice(idx,1);
+      renderWishlist();
+    }
+
+    /* ----------------------------
+       Orders / Wishlist / Reviews render
+       ---------------------------- */
+    function renderOrders() {
+      const c = document.getElementById('ordersList');
+      if (!c) return;
+      if (mockOrders.length === 0) {
+        c.innerHTML = '<p class="text-sm text-gray-500">No past orders.</p>';
+        return;
+      }
+      c.innerHTML = mockOrders.map(o => `
+        <div class="text-sm border rounded p-2">
+          <div class="flex justify-between"><div class="font-semibold">${o.id}</div><div class="text-xs text-gray-600">${o.date}</div></div>
+          <div class="text-sm mt-1">${formatINR(o.total)}</div>
+          <div class="text-xs text-gray-600 mt-1">Items: ${o.items.map(i=> i.name + ' x' + i.qty).join(', ')}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderWishlist() {
+      const c = document.getElementById('wishlistList');
+      if (!c) return;
+      if (mockWishlist.length === 0) { c.innerHTML = '<p class="text-sm text-gray-500">Wishlist is empty.</p>'; return; }
+      c.innerHTML = mockWishlist.map(w => `
+        <div class="flex items-center justify-between text-sm">
+          <div>${w.name} <div class="text-xs text-gray-500">${formatINR(w.price)}</div></div>
+          <div class="flex gap-2">
+            <button onclick="addToCart(${w.id})" class="px-2 py-1 bg-yellow-400 rounded text-xs">Add</button>
+            <button onclick="removeFromWishlist(${w.id})" class="text-red-500 text-xs">Remove</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // reviews
+    let reviews = [
+      { user:'alice@example.com', text:'Great service and fast delivery.' },
+      { user:'bob@example.com', text:'Amazing product quality.' }
+    ];
+
+    function renderReviews() {
+      const c = document.getElementById('reviewsList');
+      if (!c) return;
+      if (reviews.length === 0) c.innerHTML = '<p class="text-sm text-gray-500">No reviews yet.</p>';
+      else c.innerHTML = reviews.map(r=>`<div class="text-sm"><strong>${r.user.split('@')[0]}:</strong> <span class="text-gray-700">${r.text}</span></div>`).join('');
+    }
+
+    function postReview() {
+      const t = document.getElementById('newReview');
+      if (!t.value.trim()) { showToast('Write a review first'); return; }
+      const user = isLoggedIn ? currentUserEmail : 'guest';
+      reviews.unshift({ user, text: t.value.trim() });
+      t.value = '';
+      renderReviews();
+      showToast('Review posted');
+    }
+
+    /* ----------------------------
+       Contact & Reporting
+       ---------------------------- */
+    function handleContact(e) {
+      e.preventDefault();
+      const name = document.getElementById('contactName').value;
+      const email = document.getElementById('contactEmail').value;
+      const msg = document.getElementById('contactMessage').value;
+      // simple validation has HTML5 already; just show toast
+      showToast('Thanks, ' + (name||'friend') + '! We received your message.');
+      document.getElementById('contactForm').reset();
+    }
+
+    function report(kind) {
+      showToast(kind === 'product' ? 'Product report filed' : 'Technical issue reported');
+    }
+
+    function openContact() {
+      window.location.hash = '#contact';
+      showToast('Please fill the contact form below');
+    }
+
+    /* ----------------------------
+       Auth (Signup/Login) with validation
+       ---------------------------- */
+    function openAuth(mode='login') {
+      document.getElementById('authModal').style.display = 'flex';
+      switchAuth(mode);
+    }
+    function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
+
+    function switchAuth(mode) {
+      authMode = mode;
+      document.getElementById('authTitle').textContent = mode === 'login' ? 'Login' : 'Sign Up';
+      document.getElementById('authSubmit').textContent = mode === 'login' ? 'Login' : 'Sign Up';
+      document.getElementById('confirmGroup').style.display = mode === 'signup' ? 'block' : 'none';
+      // tabs
+      document.getElementById('tabLogin').classList.toggle('bg-teal-600', mode==='login');
+      document.getElementById('tabLogin').classList.toggle('text-white', mode==='login');
+      document.getElementById('tabSignup').classList.toggle('bg-teal-600', mode==='signup');
+      document.getElementById('tabSignup').classList.toggle('text-white', mode==='signup');
+    }
+
+    function isValidEmail(e) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    }
+
+    function handleAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPassword').value;
+      const msgEl = document.getElementById('authMessage');
+      msgEl.textContent = '';
+
+      if (!isValidEmail(email)) { msgEl.textContent = 'Enter a valid email'; return; }
+      if (pass.length < 6) { msgEl.textContent = 'Password must be at least 6 characters'; return; }
+
+      if (authMode === 'signup') {
+        const conf = document.getElementById('authConfirm').value;
+        if (pass !== conf) { msgEl.textContent = 'Passwords do not match'; return; }
+        // mock signup success
+        showToast('Sign up successful. You can now log in.');
+        switchAuth('login');
+        return;
+      }
+
+      // mock login success
+      isLoggedIn = true;
+      currentUserEmail = email;
+      closeAuth();
+      updateAccountUI();
+      showToast('Welcome, ' + email.split('@')[0]);
+    }
+
+    /* ----------------------------
+       UI toggles
+       ---------------------------- */
+    function toggleCart(force) {
+      const panel = document.getElementById('cartPanel');
+      if (typeof force === 'boolean') panel.classList.toggle('hidden', !force);
+      else panel.classList.toggle('hidden');
+    }
+
+    /* ----------------------------
+       Init on load
+       ---------------------------- */
+    function init() {
+      renderProducts();
+      renderCartUI();
+      updateAccountUI();
+      document.getElementById('authModal').style.display = 'none';
+      // initial renders
+      renderOrders();
+      renderWishlist();
+      renderReviews();
+    }
+
+    window.addEventListener('load', init);
+
+  </script>
+</body>
+</html>
